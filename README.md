@@ -1,5 +1,7 @@
 # 🧪 Prompt Lab — Free AI (OpenRouter)
 
+**[▶ Otwórz aplikację](https://onedevelopmentpl.github.io/prompt-lab/)**
+
 Darmowy, nowoczesny laboratorium do testowania i doskonalenia promptów AI. Generuj odpowiedzi w różnych stylach, ucz się technik prompt engineeringu i przechowuj historię swoich eksperymentów — wszystko lokalnie w przeglądarce.
 
 ## ✨ Główne cechy
