@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Prompt Lab – Free AI (OpenRouter)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #2f81f7;
+  --good: #3fb950;
+  --bad: #f85149;
+  --warning: #d29922;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+h3 {
+  margin: 15px 0 8px 0;
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 70px);
+}
+
+aside {
+  border-right: 1px solid var(--border);
+  padding: 15px;
+  background: var(--panel);
+  overflow-y: auto;
+  max-height: calc(100vh - 70px);
+}
+
+main {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 70px);
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+input, select, textarea, button {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  background: #0d1117;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+button {
+  cursor: pointer;
+  background: var(--accent);
+  border: none;
+  margin-top: 12px;
+}
+
+button.secondary {
+  background: #21262d;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.help {
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.help b {
+  color: var(--accent);
+}
+
+.response {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  line-height: 1.6;
+}
+
+.response strong {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.response em {
+  color: var(--warning);
+  font-style: italic;
+}
+
+.response code {
+  background: #161b22;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.response pre {
+  background: #010409;
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.responses-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.response-card {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.response-card h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.response-card .content {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.guide-section {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.guide-section .title {
+  font-weight: bold;
+  color: var(--accent);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.guide-section .description {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.guide-section .example {
+  background: #0d1117;
+  padding: 8px;
+  border-left: 3px solid var(--accent);
+  margin-top: 8px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  color: var(--text);
+}
+
+.rating {
+  margin-top: 10px;
+}
+
+.star {
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.star.active {
+  color: gold;
+}
+
+.prompt-list {
+  margin-top: 15px;
+}
+
+.prompt-item {
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  background: #0d1117;
+}
+
+footer {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🧪 Prompt Lab — Free AI (OpenRouter)</h1>
+</header>
+
+<div class="container">
+
+<aside>
+  <label>🔑 OpenRouter API Key</label>
+  <input id="apiKey" placeholder="sk-or-..." type="password">
+  <button onclick="saveKey()">Zapisz klucz</button>
+
+  <div class="help">
+    <b>[pomoc]</b><br><br>
+    <b>Tutorial jak dostać klucz:</b><br>
+    1. Zarejestruj się na
+    <a href="https://openrouter.ai" target="_blank" style="color:var(--accent);">
+      OpenRouter
+    </a><br>
+    2. Wygeneruj klucz API na stronie
+    <a href="https://openrouter.ai/settings/keys" target="_blank" style="color:var(--accent);">
+      (kliknij tu)
+    </a><br>
+    3. Wklej klucz powyżej i kliknij „Zapisz klucz”<br><br>
+    * Nie zbieramy kluczy ani danych użytkowników – wszystko jest przechowywane lokalnie w przeglądarce.<br>
+    ** Kod można znaleźć na
+    <a href="https://github.com/onedevelopmentpl/prompt-lab" target="_blank" style="color:var(--accent);">
+      GitHubie projektu
+    </a><br>
+    *** AI jest darmowe, ale OpenRouter ma limity zapytań – używaj z głową 😉
+  </div>
+
+  <label>🤖 Model</label>
+  <select id="model">
+    <option value="openrouter/free">🎲 RandomAI (free)</option>
+    <option value="qwen/qwen3-4b">Qwen 3 4B</option>
+    <option value="google/gemma-3-4b">Gemma 3 4B</option>
+    <option value="google/gemma-3-12b">Gemma 3 12B</option>
+    <option value="meta-llama/llama-3.2-3b-instruct">Llama 3.2 3B</option>
+  </select>
+
+  <h3>📚 Poradnik Promptu</h3>
+  
+  <div class="guide-section">
+    <div class="title">👤 Rola (Persona)</div>
+    <div class="description">Określ, kim ma być AI w rozmowie</div>
+    <div class="example">„Jesteś doświadczonym analitykiem danych"</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="title">📝 Zadanie (Task)</div>
+    <div class="description">Jasne polecenie z czasownikami operacyjnymi</div>
+    <div class="example">„Podsumuj", „zredaguj", „wygeneruj tabelę"</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="title">🎯 Kontekst</div>
+    <div class="description">Podaj tło zadania i dane wejściowe</div>
+    <div class="example">„Dla kogo jest tekst? Jakie dane uwzględnić?"</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="title">📋 Format odpowiedzi</div>
+    <div class="description">Określ strukturę wyniku</div>
+    <div class="example">„Tabela, lista punktowa, JSON, liczba znaków"</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="title">⛔ Ograniczenia (Constraints)</div>
+    <div class="description">Wskaż, czego AI ma unikać</div>
+    <div class="example">„Nie używaj żargonu, pomiń wstęp"</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="title">📖 Przykłady (Few-shot)</div>
+    <div class="description">Dołącz wzorcowe odpowiedzi</div>
+    <div class="example">„Chcę, by styl był taki jak w tym przykładzie:"</div>
+  </div>
+
+  <button class="secondary" onclick="exportPrompts()" style="margin-top: 15px;">📦 Export Prompt Pack</button>
+
+  <div class="prompt-list" id="promptList"></div>
+</aside>
+
+<main>
+  <label>🧠 Prompt</label>
+  <textarea id="prompt" placeholder="Napisz prompt..."></textarea>
+
+  <label style="margin-top: 15px;">⚙️ Ustawienia</label>
+  <label>
+    <input type="checkbox" id="generateVariants" style="width: auto;">
+    📌 Generuj 5 wariantów odpowiedzi
+  </label>
+  
+  <label style="display: block; margin-top: 10px;">
+    <input type="checkbox" id="showTimestamp" style="width: auto;">
+    🕐 Pokaż czas wygenerowania
+  </label>
+  
+  <label style="display: block; margin-top: 10px;">
+    <input type="checkbox" id="showModel" style="width: auto;" checked>
+    🤖 Pokaż użyty model
+  </label>
+
+  <div style="background: #161b22; border: 1px dashed var(--border); padding: 12px; border-radius: 6px; margin-top: 15px; font-size: 12px; color: var(--muted);">
+    <strong style="color: var(--accent);">⏳ Czas generowania:</strong><br>
+    Odpowiedź powinna być gotowa za ok. <strong>15-30s</strong> (zależy od zadania i wyboru modelu).<br><br>
+    <strong style="color: var(--accent);">⚠️ Problem?</strong><br>
+    Jeśli napotkasz błąd, zgłoś go na <a href="https://github.com/onedevelopmentpl/prompt-lab/issues" target="_blank" style="color: var(--accent);">GitHub Issues</a>.
+  </div>
+
+  <button onclick="sendPrompt()" style="margin-top: 15px;">▶ Wyślij do AI</button>
+
+  <div id="output" class="response" style="display:none;"></div>
+
+  <div id="outputVariants" class="responses-container" style="display:none;"></div>
+
+  <div id="modelInfo" style="font-size: 12px; color: var(--muted); margin-top: 15px; display: none;">
+    <strong>Model:</strong> <span id="modelName"></span>
+  </div>
+
+  <div id="timestampInfo" style="font-size: 12px; color: var(--muted); margin-top: 5px; display: none;">
+    <strong>Wygenerowano:</strong> <span id="timestamp"></span>
+  </div>
+
+  <div class="rating" id="rating" style="display:none;">
+    Oceń odpowiedź:
+    <span class="star" onclick="rate(1)">★</span>
+    <span class="star" onclick="rate(2)">★</span>
+    <span class="star" onclick="rate(3)">★</span>
+    <span class="star" onclick="rate(4)">★</span>
+    <span class="star" onclick="rate(5)">★</span>
+  </div>
+</main>
+
+</div>
+
+<script>
+const apiInput = document.getElementById("apiKey");
+const promptInput = document.getElementById("prompt");
+const output = document.getElementById("output");
+const outputVariants = document.getElementById("outputVariants");
+const ratingEl = document.getElementById("rating");
+const promptList = document.getElementById("promptList");
+const generateVariantsCheckbox = document.getElementById("generateVariants");
+const showTimestampCheckbox = document.getElementById("showTimestamp");
+const showModelCheckbox = document.getElementById("showModel");
+const modelInfo = document.getElementById("modelInfo");
+const timestampInfo = document.getElementById("timestampInfo");
+const modelName = document.getElementById("modelName");
+const timestamp = document.getElementById("timestamp");
+
+let prompts = JSON.parse(localStorage.getItem("prompts") || "[]");
+let lastModelUsed = "";
+
+apiInput.value = localStorage.getItem("openrouter_key") || "";
+
+function saveKey() {
+  localStorage.setItem("openrouter_key", apiInput.value);
+  alert("✅ Klucz zapisany lokalnie");
+}
+
+// Funkcja do konwertowania Markdown do HTML
+function markdownToHtml(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")  // **bold**
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")               // *italic*
+    .replace(/`(.*?)`/g, "<code>$1</code>")             // `code`
+    .replace(/^### (.*?)$/gm, "<h3>$1</h3>")            // ### heading
+    .replace(/^## (.*?)$/gm, "<h3>$1</h3>")             // ## heading
+    .replace(/^# (.*?)$/gm, "<h3>$1</h3>")              // # heading
+    .replace(/\n/g, "<br>");                            // newlines
+}
+
+function renderPrompts() {
+  promptList.innerHTML = "";
+  prompts.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "prompt-item";
+    div.textContent = `${p.prompt.slice(0, 60)}... ⭐ ${p.rating || "-"}`;
+    promptList.appendChild(div);
+  });
+}
+renderPrompts();
+
+// 5 stylów do generowania wariantów
+const styles = [
+  { name: "👶 Dla dziecka (5-8 lat)", prompt: "Wyjaśnij w sposób, jaki rozumie dziecko w wieku 5-8 lat. Używaj prostych słów, porównań do znanych rzeczy i zabawy." },
+  { name: "📚 Naukowy", prompt: "Odpowiedz w stylu akademickim, formalnym, z precyzyjnymi definicjami i merytorycznym podejściem." },
+  { name: "🎯 Praktyczny", prompt: "Daj praktyczne, konkretne porady, które można od razu wdrożyć. Skupij się na wynikach i wskazówkach." },
+  { name: "🎨 Kreatywny", prompt: "Odpowiedz w kreatywny, interesujący i unikany sposób. Używaj metafor, analogii i ciekawych porównań." },
+  { name: "⚡ Krótko i treściwie", prompt: "Odpowiedz bardzo zwięźle, używając max 2-3 zdań. Pomiń wszystkie zbędne szczegóły." }
+];
+
+async function sendPrompt() {
+  const key = apiInput.value;
+  if (!key) return alert("❌ Brak API key");
+
+  const generateVariants = generateVariantsCheckbox.checked;
+  const modelUsed = document.getElementById("model").value;
+  lastModelUsed = modelUsed;
+  
+  output.style.display = "none";
+  outputVariants.style.display = "none";
+  ratingEl.style.display = "none";
+  modelInfo.style.display = "none";
+  timestampInfo.style.display = "none";
+  output.innerHTML = "⏳ Myślę...";
+  
+  try {
+    if (generateVariants) {
+      // Generuj 5 wariantów
+      const variants = [];
+      
+      for (const style of styles) {
+        const fullPrompt = `${promptInput.value}\n\n${style.prompt}`;
+        
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: document.getElementById("model").value,
+            messages: [{ role: "user", content: fullPrompt }]
+          })
+        });
+
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content || "❌ Brak odpowiedzi";
+        variants.push({ name: style.name, content: text });
+      }
+
+      // Wyświetl warianty w grid'zie
+      outputVariants.innerHTML = "";
+      variants.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "response-card";
+        card.innerHTML = `
+          <h4>${v.name}</h4>
+          <div class="content">${markdownToHtml(v.content)}</div>
+        `;
+        outputVariants.appendChild(card);
+      });
+      outputVariants.style.display = "grid";
+
+      prompts.push({ prompt: promptInput.value, response: JSON.stringify(variants), variants: true, model: modelUsed, timestamp: new Date().toLocaleString() });
+    } else {
+      // Pojedyncza odpowiedź
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: document.getElementById("model").value,
+          messages: [{ role: "user", content: promptInput.value }]
+        })
+      });
+
+      const data = await res.json();
+      const text = data.choices?.[0]?.message?.content || "❌ Brak odpowiedzi";
+
+      output.innerHTML = markdownToHtml(text);
+      output.style.display = "block";
+
+      prompts.push({ prompt: promptInput.value, response: text, model: modelUsed, timestamp: new Date().toLocaleString() });
+    }
+
+    // Pokaż informacje o modelu i czasie
+    if (showModelCheckbox.checked) {
+      modelName.textContent = lastModelUsed;
+      modelInfo.style.display = "block";
+    }
+    
+    if (showTimestampCheckbox.checked) {
+      timestamp.textContent = new Date().toLocaleString();
+      timestampInfo.style.display = "block";
+    }
+
+    localStorage.setItem("prompts", JSON.stringify(prompts));
+    renderPrompts();
+    ratingEl.style.display = "block";
+  } catch (error) {
+    output.textContent = "❌ Błąd: " + error.message;
+    output.style.display = "block";
+  }
+}
+
+function rate(stars) {
+  document.querySelectorAll(".star").forEach((s, i) => {
+    s.classList.toggle("active", i < stars);
+  });
+  prompts[prompts.length - 1].rating = stars;
+  localStorage.setItem("prompts", JSON.stringify(prompts));
+  renderPrompts();
+}
+
+function exportPrompts() {
+  const blob = new Blob(
+    [JSON.stringify(prompts, null, 2)],
+    { type: "application/json" }
+  );
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "prompt-pack.json";
+  a.click();
+}
+</script>
+
+<footer>
+  Developed by <a href="https://github.com/onedevelopmentpl" target="_blank">OneDevelopment</a>
+</footer>
+
+</body>
+</html>
