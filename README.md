@@ -1,4 +1,4 @@
-# 🧪 Prompt Lab — Free AI (OpenRouter)
+# 🧪 Prompt Lab - Free AI (OpenRouter)
 
 **[▶ Otwórz aplikację](https://onedevelopmentpl.github.io/prompt-lab/)**
 
